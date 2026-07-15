@@ -8,7 +8,7 @@ public class HelloController {
 
     @GetMapping("/")
     public String home() {
-        return "Hello from Java Maven App! Built by Jenkins CI/CD Pipeline";
+        return "Hello from Java Maven App! Built by Jenkins CI/CD Pipeline-v1";
     }
 
     @GetMapping("/health")
