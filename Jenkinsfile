@@ -6,7 +6,6 @@ pipeline {
         DOCKER_TAG = "${BUILD_NUMBER}"
         NEXUS_URL = 'http://node3:8081'
         SONAR_PROJECT = 'java-maven-app'
-        JAVA_VERSION = '25'
     }
 
     stages {
