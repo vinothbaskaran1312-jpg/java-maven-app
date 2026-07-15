@@ -6,6 +6,7 @@ pipeline {
         DOCKER_TAG = "${BUILD_NUMBER}"
         NEXUS_URL = 'http://node3:8081'
         SONAR_PROJECT = 'java-maven-app'
+        JAVA_VERSION = '25'
     }
 
     stages {
@@ -82,6 +83,7 @@ pipeline {
                         curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /home/jenkins/bin
                     fi
                     /home/jenkins/bin/trivy image \
+                        --timeout 15m \
                         --severity HIGH,CRITICAL \
                         --exit-code 0 \
                         --no-progress \
