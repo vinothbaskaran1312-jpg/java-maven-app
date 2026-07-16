@@ -82,6 +82,7 @@ pipeline {
                         curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /home/jenkins/bin
                     fi
                     /home/jenkins/bin/trivy image \
+                        --timeout 15m \
                         --severity HIGH,CRITICAL \
                         --exit-code 0 \
                         --no-progress \
