@@ -1,6 +1,14 @@
 pipeline {
     agent { label 'node2' }
 
+     options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+
+    environment {
+        ...
+    }
+
     environment {
         DOCKER_IMAGE = 'vinothbaskaran1985/java-maven-app'
         DOCKER_TAG = "${BUILD_NUMBER}"
