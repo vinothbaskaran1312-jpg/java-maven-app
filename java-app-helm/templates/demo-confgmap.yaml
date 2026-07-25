@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: demo-config
-data:
-  application: "java-maven-app"
-  environment: "dev"
