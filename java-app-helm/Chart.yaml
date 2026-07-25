@@ -1,5 +1,5 @@
 apiVersion: v2
-name: java-app-helm
+name: java-maven-app
 description: Enterprise Java Maven Application
 
 # A chart can be either an 'application' or a 'library' chart.

@@ -121,15 +121,22 @@ pipeline {
                     passwordVariable: 'GIT_PASS'
                 )]) {
                     sh """
-                        rm -rf jenkins-demo-manifests
-                        git clone https://\${GIT_USER}:\${GIT_PASS}@github.com/vinothbaskaran1312-jpg/jenkins-demo-manifests.git
-                        cd jenkins-demo-manifests
-                        sed -i 's|${DOCKER_IMAGE}:.*|${DOCKER_IMAGE}:${DOCKER_TAG}|g' deployment.yaml
                         git config user.email "jenkins@node1"
                         git config user.name "Jenkins"
-                        git add deployment.yaml
-                        git commit -m "Update java-maven-app image to ${DOCKER_TAG} [skip ci]"
-                        git push https://\${GIT_USER}:\${GIT_PASS}@github.com/vinothbaskaran1312-jpg/jenkins-demo-manifests.git main
+
+                        # Update Helm values.yaml
+                        sed -i "s/tag: \".*\"/tag: \"${DOCKER_TAG}\"/" java-app-helm/values.yaml
+
+                        echo "Updated values.yaml"
+                        grep -A3 "image:" java-app-helm/values.yaml
+
+                        git add java-app-helm/values.yaml
+
+                        git commit -m "Update image tag to ${DOCKER_TAG} [skip ci]" || true
+
+                        git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/vinothbaskaran1312-jpg/java-maven-app.git
+
+                        git push origin main
                     """
                 }
             }
