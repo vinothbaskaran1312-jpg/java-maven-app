@@ -122,6 +122,9 @@ pipeline {
                         git config user.email "jenkins@node1"
                         git config user.name "Jenkins"
 
+                        # Checkout the main branch (avoids detached HEAD)
+                        git checkout main || git checkout -B main origin/main
+
                         # Update Helm values.yaml
                         sed -i "s/tag: \".*\"/tag: \"${DOCKER_TAG}\"/" java-app-helm/values.yaml
 
@@ -133,8 +136,12 @@ pipeline {
                         git commit -m "Update image tag to ${DOCKER_TAG} [skip ci]" || true
 
                         git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/vinothbaskaran1312-jpg/java-maven-app.git
-
-                        git push origin main
+                        echo "Current branch:"
+                        git branch
+                        echo "Current HEAD:"
+                        git rev-parse --abbrev-ref HEAD
+                        git status
+                        git push origin HEAD:main
                     """
                 }
             }
