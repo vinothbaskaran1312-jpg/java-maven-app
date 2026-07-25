@@ -132,7 +132,7 @@ pipeline {
 
                         git commit -m "Update image tag to ${DOCKER_TAG} [skip ci]" || true
 
-                        git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/vinothbaskaran1312-jpg/java-maven-app.git
+                        git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/vinothbaskaran1312-jpg/java-maven-app.git
 
                         git push origin main
                     """
