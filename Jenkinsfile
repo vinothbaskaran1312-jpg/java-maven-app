@@ -1,12 +1,10 @@
 pipeline {
-    agent { label 'node2' }
-
-     options {
-        buildDiscarder(logRotator(numToKeepStr: '5'))
+    agent {
+        label 'node2'
     }
 
-    environment {
-        ...
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
     }
 
     environment {
