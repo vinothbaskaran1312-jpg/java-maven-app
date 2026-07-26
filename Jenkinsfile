@@ -125,6 +125,11 @@ pipeline {
 
                         cd gitops-repo
 
+                        echo "Current commit:"
+                        git log --oneline -1
+                        echo "Current tag value:"
+                        grep -n "tag:" values-dev.yaml
+
                         git checkout main
 
 
@@ -137,7 +142,7 @@ pipeline {
                         grep -A4 "image:" values-dev.yaml
 
                         git add values-dev.yaml
-                        git diff --quiet && echo "No GitOps changes to commit" || \
+                        
                         git commit -m "Update image tag to ${DOCKER_TAG} [skip ci]" || true
 
                         git push origin main
