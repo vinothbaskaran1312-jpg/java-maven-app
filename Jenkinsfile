@@ -111,38 +111,38 @@ pipeline {
             }
         }
 
-        stage('Update Manifests') {
+        stage('Update GitOps Repository') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'github-credentials',
                     usernameVariable: 'GIT_USER',
                     passwordVariable: 'GIT_PASS'
                 )]) {
-                    sh """
+                    sh '''
+                        rm -rf gitops-repo
+
+                        git clone https://${GIT_USER}:${GIT_PASS}@github.com/vinothbaskaran1312-jpg/java-maven-app-gitops.git gitops-repo
+
+                        cd gitops-repo
+
+                        git checkout main
+
+
                         git config user.email "jenkins@node1"
                         git config user.name "Jenkins"
 
-                        # Checkout the main branch (avoids detached HEAD)
-                        git checkout main || git checkout -B main origin/main
+                        sed -i "s/tag: \\".*\\"/tag: \\"${DOCKER_TAG}\\"/" values-dev.yaml
 
-                        # Update Helm values.yaml
-                        sed -i "s/tag: \".*\"/tag: \"${DOCKER_TAG}\"/" java-app-helm/values.yaml
+                        echo "Updated values-dev.yaml"
+                        grep -A4 "image:" values-dev.yaml
 
-                        echo "Updated values.yaml"
-                        grep -A3 "image:" java-app-helm/values.yaml
-
-                        git add java-app-helm/values.yaml
-
+                        git add values-dev.yaml
+                        git diff --quiet && echo "No GitOps changes to commit" || \
                         git commit -m "Update image tag to ${DOCKER_TAG} [skip ci]" || true
 
-                        git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/vinothbaskaran1312-jpg/java-maven-app.git
-                        echo "Current branch:"
-                        git branch
-                        echo "Current HEAD:"
-                        git rev-parse --abbrev-ref HEAD
-                        git status
-                        git push origin HEAD:main
-                    """
+                        git push origin main
+                    
+                    '''
                 }
             }
         }
