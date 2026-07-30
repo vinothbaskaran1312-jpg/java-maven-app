@@ -151,8 +151,83 @@ pipeline {
                 }
             }
         }
-    }
+        stage('Approve Stage Deployment') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    input(
+                        message: "Deploy image ${DOCKER_TAG} to STAGE?",
+                        ok: "Deploy"
+                    )
+                }
+            }
+        }
+        stage('Update Stage GitOps') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-credentials',
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_PASS'
+                )]) {
+                    sh '''
+                        rm -rf gitops-stage
 
+                        git clone https://${GIT_USER}:${GIT_PASS}@github.com/vinothbaskaran1312-jpg/java-maven-app-gitops.git gitops-stage
+
+                        cd gitops-stage
+
+                        git config user.email "jenkins@node1"
+                        git config user.name "Jenkins"
+
+                        sed -i "s/tag: \\".*\\"/tag: \\"${DOCKER_TAG}\\"/" values-stage.yaml
+
+                        git add values-stage.yaml
+
+                        git commit -m "Promote image ${DOCKER_TAG} to Stage [skip ci]" || true
+
+                        git push origin main
+                    '''
+                }
+            }
+        }
+        stage('Approve Production Deployment') {
+            steps {
+                timeout(time: 2, unit: 'HOURS') {
+                    input(
+                        message: "Deploy image ${DOCKER_TAG} to PRODUCTION?",
+                        ok: "Deploy"
+                    )
+                }
+            }
+        }
+        stage('Update Production GitOps') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-credentials',
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_PASS'
+                )]) {
+                    sh '''
+                        rm -rf gitops-prod
+
+                        git clone https://${GIT_USER}:${GIT_PASS}@github.com/vinothbaskaran1312-jpg/java-maven-app-gitops.git gitops-prod
+
+                        cd gitops-prod
+
+                        git config user.email "jenkins@node1"
+                        git config user.name "Jenkins"
+
+                        sed -i "s/tag: \\".*\\"/tag: \\"${DOCKER_TAG}\\"/" values-prod.yaml
+
+                        git add values-prod.yaml
+
+                        git commit -m "Promote image ${DOCKER_TAG} to Production [skip ci]" || true
+
+                        git push origin main
+                    '''
+                }
+            }
+        }
+    }
     post {
         success {
             echo '✅ Enterprise CI/CD Pipeline completed successfully!'
